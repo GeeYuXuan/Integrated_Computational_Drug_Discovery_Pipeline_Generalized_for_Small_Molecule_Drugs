@@ -300,6 +300,9 @@ If you build on this, please cite the underlying tools:
 
 | Symptom | Cause and fix |
 |---|---|
+| `Failed building wheel for vina` | The `vina` **Python package** has no wheel for Python 3.13 (Colab's current interpreter). The pipeline does not use it — docking drives the `vina` **executable** from `apt install autodock-vina`. If you see this, you are running an older copy of Step 0 that pip-installed `vina`; pull the latest notebook |
+| `AutoDock Vina executable not found` | Run `!apt-get install -y autodock-vina`, or set `vina_binary` in `pipeline_common.py` to its full path |
+| `Install failed for: ['rdkit', 'vina', 'Bio']` | One failing build aborts a whole `pip install`. Step 0 now installs each package separately so this cannot cascade — pull the latest notebook |
 | `Could not download pipeline_common.py` | Upload `pipeline_common.py` from this repository into `/content`, then re-run Step 0b |
 | `Reference ligand 'XXX' is not present` | The structure does not contain that ligand. The error lists what *is* present — pick one, or set `ligand_resname` to `None` for auto-detection |
 | `Could not locate a binding site` | No drug-like ligand, no cofactor, no usable `active_site_residue`. Set `ligand_resname` or `box_center` explicitly rather than letting it guess |

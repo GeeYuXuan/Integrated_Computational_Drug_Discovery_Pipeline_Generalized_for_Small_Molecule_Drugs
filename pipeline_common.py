@@ -22,6 +22,8 @@ from __future__ import annotations
 import json
 import math
 import os
+import shutil
+import subprocess
 from datetime import date
 from pathlib import Path
 
@@ -30,6 +32,7 @@ __all__ = [
     "get_config", "export_globals", "describe_config",
     "parse_hetero_groups", "centroid", "group_extent", "resolve_box_center",
     "fit_box_size", "write_receptor",
+    "find_vina_binary", "parse_vina_poses", "dock_with_vina_cli",
     "normalize_fixed", "spread_is_meaningful", "ligand_efficiency",
     "inchikey", "is_peptide_like", "morgan_fp", "max_tanimoto_to_training",
     "json_safe",
@@ -128,6 +131,10 @@ SHARED = {
     "box_size_max": 40.0,               # refuse to grow beyond this
     "exhaustiveness": 16,               # 8 is Vina's floor, not a good default
     "num_modes": 9,                     # >1 so pose convergence can be inspected
+    # Docking runs through the `vina` executable, not the Python bindings, which
+    # have no wheel for Python 3.13 (what Colab now runs). None = find it on PATH.
+    "vina_binary": None,
+    "vina_cpu": None,                   # None = let Vina use every core
     # Published RMSE of the Vina scoring function. Differences smaller than this
     # between two compounds are not real differences.
     "vina_score_error_kcal": 2.85,
@@ -604,6 +611,113 @@ def write_receptor(pdb_path, out_path, cfg: dict, exclude_reference: dict | None
         if skip:
             print(f"  Reference ligand {sorted(skip)[0][0]} removed from the receptor")
     return out_path
+
+
+# =============================================================================
+# 4b. RUNNING AUTODOCK VINA  -- through the command line, not the Python bindings
+# =============================================================================
+#
+# The `vina` Python package publishes no wheel for Python 3.13, which is what Colab
+# now runs, and building it from source there fails:
+#
+#     Building wheel for vina (pyproject.toml) did not run successfully.
+#     ERROR: Failed building wheel for vina
+#
+# Worse, putting it in the same `pip install` as everything else made its failure
+# abort the whole command, so RDKit and Biopython were not installed either.
+#
+# The apt package `autodock-vina` provides /usr/bin/vina (v1.2.5) -- the same engine
+# the bindings wrap. Driving it through the command line removes the Python-version
+# dependency entirely and gives the same numbers, which the pose files prove: the
+# affinity written as `REMARK VINA RESULT:` is exactly what the bindings return.
+
+def find_vina_binary(explicit: str | None = None):
+    """Locate the AutoDock Vina executable, or return None."""
+    candidates = [explicit] if explicit else []
+    candidates += ["vina", "autodock_vina", "vina_1.2.5_linux_x86_64",
+                   "/usr/bin/vina", "/usr/local/bin/vina"]
+    for name in candidates:
+        if not name:
+            continue
+        path = shutil.which(name) or (name if Path(name).is_file() else None)
+        if path:
+            return str(path)
+    return None
+
+
+def parse_vina_poses(pose_path) -> list:
+    """Affinities (kcal/mol) from a Vina output PDBQT, best pose first.
+
+    Vina writes one ``REMARK VINA RESULT:`` line per pose:
+
+        REMARK VINA RESULT:    -8.186      0.000      0.000
+                               ^ affinity  ^ rmsd l.b ^ rmsd u.b
+    """
+    energies = []
+    try:
+        with open(pose_path, "r", encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                if line.startswith("REMARK VINA RESULT:"):
+                    parts = line.split()
+                    if len(parts) >= 4:
+                        try:
+                            energies.append(float(parts[3]))
+                        except ValueError:
+                            pass
+    except OSError:
+        return []
+    return energies
+
+
+def dock_with_vina_cli(receptor_pdbqt, ligand_pdbqt, center, box_size, out_pose,
+                       cfg: dict | None = None, vina_bin: str | None = None,
+                       timeout: int = 3600):
+    """Dock one ligand. Returns ``(best_affinity, all_affinities, error)``.
+
+    ``error`` is None on success, otherwise a short string explaining the failure.
+    """
+    cfg = cfg or SHARED
+    vina_bin = vina_bin or find_vina_binary(cfg.get("vina_binary"))
+    if not vina_bin:
+        return None, None, (
+            "AutoDock Vina executable not found. Install it with "
+            "`apt-get install -y autodock-vina` (Colab/Debian) or "
+            "`brew install autodock-vina` (macOS), or set 'vina_binary' in "
+            "pipeline_common.py to its full path.")
+
+    cmd = [
+        vina_bin,
+        "--receptor", str(receptor_pdbqt),
+        "--ligand", str(ligand_pdbqt),
+        "--center_x", f"{center[0]:.3f}",
+        "--center_y", f"{center[1]:.3f}",
+        "--center_z", f"{center[2]:.3f}",
+        "--size_x", f"{box_size:.3f}",
+        "--size_y", f"{box_size:.3f}",
+        "--size_z", f"{box_size:.3f}",
+        "--exhaustiveness", str(int(cfg.get("exhaustiveness", 16))),
+        "--num_modes", str(int(cfg.get("num_modes", 9))),
+        "--seed", str(int(cfg.get("random_seed", 42))),
+        "--out", str(out_pose),
+    ]
+    if cfg.get("vina_cpu"):
+        cmd += ["--cpu", str(int(cfg["vina_cpu"]))]
+
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return None, None, f"timed out after {timeout}s"
+    except OSError as exc:
+        return None, None, f"could not run {vina_bin}: {exc}"
+
+    if proc.returncode != 0:
+        tail = (proc.stderr or proc.stdout or "").strip().splitlines()
+        return None, None, (tail[-1][:200] if tail else f"exit code {proc.returncode}")
+
+    energies = parse_vina_poses(out_pose)
+    if not energies:
+        return None, None, "docking produced no poses"
+    return min(energies), energies, None
 
 
 # =============================================================================

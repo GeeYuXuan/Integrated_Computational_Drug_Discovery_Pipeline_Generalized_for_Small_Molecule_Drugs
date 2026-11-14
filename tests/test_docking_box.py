@@ -45,6 +45,40 @@ def old_box_center(pdb_path):
     return tuple(sum(p[i] for p in pts) / len(pts) for i in range(3))
 
 
+def check_pose_parser():
+    """parse_vina_poses() must read exactly what the Python bindings reported.
+
+    Docking now runs through the `vina` executable rather than the `vina` Python
+    package, which has no wheel for Python 3.13 (Colab's current interpreter).
+    Every committed pose file was produced by the bindings, so the affinity this
+    parser reads from `REMARK VINA RESULT:` must equal the affinity recorded in
+    the matching docking_results.csv.
+    """
+    import csv
+    checked = mismatched = 0
+    for target, backup in (("kras", "kras_project_backup_15Jan26"),
+                           ("egfr", "egfr_project_backup_16Jan26"),
+                           ("mtor", "mtor_project_backup_16Jan26")):
+        results = ROOT / backup / "results" / f"{target}_docking_results.csv"
+        if not results.exists():
+            continue
+        with open(results, encoding="utf-8") as fh:
+            for row in csv.DictReader(fh):
+                pose = results.parent / f"{row['Candidate_ID']}_docked.pdbqt"
+                if not pose.exists():
+                    continue
+                parsed = pc.parse_vina_poses(pose)
+                recorded = float(row["Affinity_kcal_mol"])
+                checked += 1
+                if not parsed or abs(parsed[0] - recorded) > 1e-6:
+                    mismatched += 1
+                    print(f"  MISMATCH {target} {row['Candidate_ID']}: "
+                          f"csv {recorded}, parsed {parsed[:1]}")
+    print(f"\n  parse_vina_poses: {checked} pose files checked, "
+          f"{mismatched} mismatched")
+    return [] if not mismatched else [f"{mismatched} pose files mis-parsed"]
+
+
 def main():
     failures = []
     for target, rel_path, expected in CASES:
@@ -87,12 +121,18 @@ def main():
                             f"got {info['source']}")
 
     print("\n" + "=" * 72)
+    print("POSE PARSER")
+    print("=" * 72)
+    failures += check_pose_parser()
+
+    print("\n" + "=" * 72)
     if failures:
         print("FAILED")
         for f in failures:
             print("  - " + f)
         return 1
-    print(f"PASSED — box centred on the pocket for all {len(CASES)} structures")
+    print(f"PASSED — box centred on the pocket for all {len(CASES)} structures, "
+          f"and the pose parser agrees with every recorded affinity")
     return 0
 
 

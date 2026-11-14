@@ -10,8 +10,16 @@
 # in earlier releases.
 rdkit>=2023.3.1
 
-# Vina >= 1.2 is required for the Python bindings (`from vina import Vina`).
-vina>=1.2.5
+# NOTE: the `vina` PYTHON package is deliberately NOT listed.
+#
+# It publishes no wheel for Python 3.13 -- which is what Google Colab now runs --
+# and building it from source there fails ("Failed building wheel for vina").
+# Docking instead drives the `vina` EXECUTABLE from the autodock-vina system
+# package (see the system-binaries note at the bottom). Same engine, same
+# affinities, no Python-version dependency.
+#
+# If you are on Python <= 3.12 and prefer the bindings, `pip install vina>=1.2.5`
+# still works; the pipeline does not use them either way.
 
 chembl_webresource_client>=0.10.8
 biopython>=1.81
