@@ -1,0 +1,54 @@
+================================================================================
+KRAS G12D Analysis Findings
+================================================================================
+
+[1] PMID: 38975874
+Title: Mechanisms of Resistance to Oncogenic KRAS Inhibition in Pancreatic Cancer.
+Query: KRAS resistance mechanisms
+Abstract: KRAS inhibitors demonstrate clinical efficacy in pancreatic ductal adenocarcinoma (PDAC); however, resistance is common. Among patients with KRASG12C-mutant PDAC treated with adagrasib or sotorasib, mutations in PIK3CA and KRAS, and amplifications of KRASG12C, MYC, MET, EGFR, and CDK6 emerged at acq...
+
+[2] PMID: 38668053
+Title: KRAS: Biology, Inhibition, and Mechanisms of Inhibitor Resistance.
+Query: KRAS resistance mechanisms
+Abstract: KRAS is a small GTPase that is among the most commonly mutated oncogenes in cancer. Here, we discuss KRAS biology, therapeutic avenues to target it, and mechanisms of resistance that tumors employ in response to KRAS inhibition. Several strategies are under investigation for inhibiting oncogenic KRA...
+
+[3] PMID: 37831779
+Title: Acquired resistance to KRAS G12C small-molecule inhibitors via genetic/nongenetic mechanisms in lung cancer.
+Query: KRAS resistance mechanisms
+Abstract: Inherent or acquired resistance to sotorasib poses a substantialt challenge for NSCLC treatment. Here, we demonstrate that acquired resistance to sotorasib in isogenic cells correlated with increased expression of integrin β4 (ITGB4), a component of the focal adhesion complex. Silencing ITGB4 in tol...
+
+[4] PMID: 39732595
+Title: KRAS inhibitors: resistance drivers and combinatorial strategies.
+Query: KRAS resistance mechanisms
+Abstract: In 1982, the RAS genes HRAS and KRAS were discovered as the first human cancer genes, with KRAS later identified as one of the most frequently mutated oncogenes. Yet, it took nearly 40 years to develop clinically effective inhibitors for RAS-mutant cancers. The discovery in 2013 by Shokat and collea...
+
+[5] PMID: 34161704
+Title: Acquired Resistance to KRAS<sup>G12C</sup> Inhibition in Cancer.
+Query: KRAS resistance mechanisms
+Abstract: Clinical trials of the KRAS inhibitors adagrasib and sotorasib have shown promising activity in cancers harboring KRAS glycine-to-cysteine amino acid substitutions at codon 12 (KRAS<sup>G12C</sup>). The mechanisms of acquired resistance to these therapies are currently unknown. Among patients with <...
+
+[6] PMID: 34889605
+Title: Identification of MRTX1133, a Noncovalent, Potent, and Selective KRAS<sup>G12D</sup> Inhibitor.
+Query: KRAS G12D structure drug
+Abstract: KRAS<sup>G12D</sup>, the most common oncogenic KRAS mutation, is a promising target for the treatment of solid tumors. However, when compared to KRAS<sup>G12C</sup>, selective inhibition of KRAS<sup>G12D</sup> presents a significant challenge due to the requirement of inhibitors to bind KRAS<sup>G12...
+
+[7] PMID: 36216931
+Title: Anti-tumor efficacy of a potent and selective non-covalent KRAS<sup>G12D</sup> inhibitor.
+Query: KRAS G12D structure drug
+Abstract: Recent progress in targeting KRAS<sup>G12C</sup> has provided both insight and inspiration for targeting alternative KRAS mutants. In this study, we evaluated the mechanism of action and anti-tumor efficacy of MRTX1133, a potent, selective and non-covalent KRAS<sup>G12D</sup> inhibitor. MRTX1133 dem...
+
+[8] PMID: 39970873
+Title: KRAS<sup>G12D</sup>-driven pentose phosphate pathway remodeling imparts a targetable vulnerability synergizing with MRTX1133 for durable remissions in PDAC.
+Query: KRAS G12D structure drug
+Abstract: The KRAS<sup>G12D</sup> inhibitor MRTX1133 shows the potential to revolutionize the treatment paradigm for pancreatic ductal adenocarcinoma (PDAC), yet presents challenges. Our findings indicate that KRAS<sup>G12D</sup> remodels a pentose phosphate pathway (PPP)-dominant central carbon metabolism pa...
+
+[9] PMID: 37831007
+Title: A Small Molecule with Big Impact: MRTX1133 Targets the KRASG12D Mutation in Pancreatic Cancer.
+Query: KRAS G12D structure drug
+Abstract: KRAS mutations drive oncogenic alterations in numerous cancers, particularly in human pancreatic ductal adenocarcinoma (PDAC). About 93% of PDACs have KRAS mutations, with G12D (∼42% of cases) and G12V (∼32% of cases) being the most common. The recent approval of sotorasib (AMG510), a small-molecule...
+
+[10] PMID: 36414681
+Title: Glimmers of hope for targeting oncogenic KRAS-G12D.
+Query: KRAS G12D structure drug
+Abstract: KRAS mutations are one of the most common genetic abnormalities in cancer, especially lung, colon, and pancreatic cancers. Strategies targeting the oncogenic KRAS pathway include direct and indirect approaches. KRAS-G12C inhibitors developed based on binding to the switch II pocket structure of KRAS...
+

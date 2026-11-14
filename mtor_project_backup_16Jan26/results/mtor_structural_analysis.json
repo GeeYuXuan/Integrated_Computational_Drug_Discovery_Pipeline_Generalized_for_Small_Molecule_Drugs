@@ -1,0 +1,45 @@
+{
+  "structure": {
+    "pdb_id": "4JSV",
+    "mutation_site": {
+      "residue": "Unknown",
+      "position": "Unknown",
+      "chain": "Unknown"
+    },
+    "distance_to_ligand": null,
+    "closest_ligand": "ADP",
+    "pocket_residue_count": 17
+  },
+  "literature": [
+    {
+      "pmid": "32014673",
+      "title": "Mechanisms of resistance to mTOR inhibitors.",
+      "abstract": "In several tumors the PI3K/AKT/mTOR pathway is frequently disrupted, an event that results in uncontrolled cell proliferation and tumor growth. Through the years, several compounds have been developed to inhibit the pathway at different steps: the mammalian target of rapamycin (mTOR) seemed to be the most qualified target. However, this kinase has such a key role in cell survival that mechanisms of resistance are rapidly developed. Nevertheless, clinical results obtained with mTOR inhibitors in breast cancer, renal cell carcinoma, neuroendocrine tumors and mantle cell lymphoma push oncologists to actively further develop these drugs, maybe by better selecting the population to which they are offered, through the research of predictive factors of responsiveness. In this review, we aim to describe mechanisms of resistance to mTOR inhibitors, from preclinical and clinical perspectives.",
+      "query": "MTOR resistance mechanisms"
+    },
+    {
+      "pmid": "21547705",
+      "title": "Mechanisms of mTOR inhibitor resistance in cancer therapy.",
+      "abstract": "Mammalian target of rapamycin (mTOR) is a conserved serine/threonine kinase that regulates cell cycle progression, protein translation, metabolism, and cellular proliferation. The mTOR pathway promotes cell proliferation under energy or nutrient-rich conditions by increasing ribosomal biogenesis and protein synthesis. Since enhanced activity of the mTOR pathway is frequently observed in malignant cells, inhibition of this kinase has become an attractive strategy to treat cancer. Rapamycin and its analogs temsirolimus, everolimus, and ridaforolimus referred to as \"rapalogs\" have demonstrated promising efficacy against renal cell carcinoma and are under investigation for the treatment of other malignancies. However, the emergence of drug resistance may ultimately limit the utility of rapalog therapy. Here we summarize the known mechanisms of resistance to mTOR-inhibitor therapy and describe potential strategies to overcome these for the current agents that target this pathway.",
+      "query": "MTOR resistance mechanisms"
+    },
+    {
+      "pmid": "34175443",
+      "title": "Attacking the PI3K/Akt/mTOR signaling pathway for targeted therapeutic treatment in human cancer.",
+      "abstract": "Cancer is the second leading cause of human death globally. PI3K/Akt/mTOR signaling is one of the most frequently dysregulated signaling pathways observed in cancer patients that plays crucial roles in promoting tumor initiation, progression and therapy responses. This is largely due to that PI3K/Akt/mTOR signaling is indispensable for many cellular biological processes, including cell growth, metastasis, survival, metabolism, and others. As such, small molecule inhibitors targeting major kinase components of the PI3K/Akt/mTOR signaling pathway have drawn extensive attention and been developed and evaluated in preclinical models and clinical trials. Targeting a single kinase component within this signaling usually causes growth arrest rather than apoptosis associated with toxicity-induced adverse effects in patients. Combination therapies including PI3K/Akt/mTOR inhibitors show improved patient response and clinical outcome, albeit developed resistance has been reported. In this review, we focus on revealing the mechanisms leading to the hyperactivation of PI3K/Akt/mTOR signaling in cancer and summarizing efforts for developing PI3K/Akt/mTOR inhibitors as either mono-therapy or combination therapy in different cancer settings. We hope that this review will facilitate further understanding of the regulatory mechanisms governing dysregulation of PI3K/Akt/mTOR oncogenic signaling in cancer and provide insights into possible future directions for targeted therapeutic regimen for cancer treatment, by developing new agents, drug delivery systems, or combination regimen to target the PI3K/Akt/mTOR signaling pathway. This information will also provide effective patient stratification strategy to improve the patient response and clinical outcome for cancer patients with deregulated PI3K/Akt/mTOR signaling.",
+      "query": "MTOR resistance mechanisms"
+    },
+    {
+      "pmid": "30928610",
+      "title": "Advances in understanding the mechanisms of evasive and innate resistance to mTOR inhibition in cancer cells.",
+      "abstract": "The development of drug-resistance by neoplastic cells is recognized as a major cause of targeted therapy failure and disease progression. The mechanistic (previously mammalian) target of rapamycin (mTOR) is a highly conserved Ser/Thr kinase that acts as the catalytic subunit of two structurally and functionally distinct large multiprotein complexes, referred to as mTOR complex 1 (mTORC1) and mTORC2. Both mTORC1 and mTORC2 play key roles in a variety of healthy cell types/tissues by regulating physiological anabolic and catabolic processes in response to external cues. However, a body of evidence identified aberrant activation of mTOR signaling as a common event in many human tumors. Therefore, mTOR is an attractive target for therapeutic targeting in cancer and this fact has driven the development of numerous mTOR inhibitors, several of which have progressed to clinical trials. Nevertheless, mTOR inhibitors have met with a very limited success as anticancer therapeutics. Among other reasons, this failure was initially ascribed to the activation of several compensatory signaling pathways that dampen the efficacy of mTOR inhibitors. The discovery of these regulatory feedback mechanisms greatly contributed to a better understanding of cancer cell resistance to mTOR targeting agents. However, over the last few years, other mechanisms of resistance have emerged, including epigenetic alterations, compensatory metabolism rewiring and the occurrence of mTOR mutations. In this article, we provide the reader with an updated overview of the mechanisms that could explain resistance of cancer cells to the various classes of mTOR inhibitors.",
+      "query": "MTOR resistance mechanisms"
+    },
+    {
+      "pmid": "23668928",
+      "title": "Molecular mechanisms of tumor resistance to PI3K-mTOR-targeted therapy.",
+      "abstract": "Deregulation of the phosphatidylinositide 3-kinase (PI3K) and mammalian target of rapamycin (mTOR) signaling pathway occurs frequently in a wide range of human cancers and is a major driving force in tumorigenesis. Thus, small molecules targeting this pathway are under active development as anticancer therapeutics. Although small-molecule inhibitors of the PI3K-mTOR pathway have shown promising clinical efficacy against human cancers, the emergence of drug resistance may limit their success in the clinic. To date, several resistance mechanisms, including both PI3K-dependent and -independent mechanisms, have been described. Here, we summarize the current understanding of resistance mechanisms to PI3K-mTOR inhibitors and discuss potential strategies for overcoming resistance for potential clinical application.",
+      "query": "MTOR resistance mechanisms"
+    }
+  ]
+}
