@@ -7,3 +7,8 @@
 # Python / Jupyter clutter
 __pycache__/
 .ipynb_checkpoints/
+
+# Pipeline runtime artefacts
+pipeline_config.json
+.pytest_scratch/
+_testtmp/

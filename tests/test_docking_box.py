@@ -1,0 +1,100 @@
+"""
+Regression test for the docking box centre.
+
+This is the test that the original pipeline needed and did not have. It runs
+against the three real PDB structures committed in the *_project_backup_* folders
+and needs nothing but the Python standard library — no RDKit, no Vina.
+
+Run from the repository root:
+
+    python tests/test_docking_box.py
+
+The old implementation averaged the coordinates of every non-water HETATM record
+into one point. That is correct only when a structure contains exactly one hetero
+group. Measured here:
+
+    EGFR 5Y9T   1 hetero group                 0.0 A off   (accidentally correct)
+    KRAS 7RT1   2 ligand copies + GDP + Mg     7.3 A off   (pocket clipped)
+    mTOR 4JSV   ADP x2 + ions, in a dimer     37.7 A off   (box held no pocket)
+"""
+import math
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+import pipeline_common as pc  # noqa: E402
+
+# (target, structure, true pocket centre = centroid of ONE reference ligand copy)
+CASES = [
+    ("kras", "kras_project_backup_15Jan26/workflow/data/7RT1.pdb", (1.58, 4.75, -23.51)),
+    ("egfr", "egfr_project_backup_16Jan26/workflow/data/5Y9T.pdb", (-0.46, 49.56, -17.66)),
+    ("mtor", "mtor_project_backup_16Jan26/workflow/data/4JSV.pdb", (50.12, -1.80, -45.90)),
+]
+
+
+def old_box_center(pdb_path):
+    """Reproduce the original implementation, for comparison."""
+    pts = []
+    with open(pdb_path, encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            if line.startswith("HETATM") and "HOH" not in line:
+                pts.append((float(line[30:38]), float(line[38:46]), float(line[46:54])))
+            elif line.startswith("END"):
+                break
+    return tuple(sum(p[i] for p in pts) / len(pts) for i in range(3))
+
+
+def main():
+    failures = []
+    for target, rel_path, expected in CASES:
+        path = ROOT / rel_path
+        if not path.exists():
+            print(f"SKIP {target}: {rel_path} not present")
+            continue
+
+        print("\n" + "=" * 72)
+        print(f"{target.upper()}  ({path.name})")
+        print("=" * 72)
+
+        cfg = pc.get_config(target, base_dir=str(ROOT / ".pytest_scratch"),
+                            persist=False, quiet=True)
+        center, info = pc.resolve_box_center(path, cfg, verbose=True)
+        size = pc.fit_box_size(info, cfg, verbose=True)
+
+        d_new = math.dist(center, expected)
+        d_old = math.dist(old_box_center(path), expected)
+        coords = info["reference_coords"]
+        half = size / 2.0
+        inside_new = sum(1 for p in coords
+                         if all(abs(p[i] - center[i]) <= half for i in range(3)))
+        old_c = old_box_center(path)
+        inside_old = sum(1 for p in coords
+                         if all(abs(p[i] - old_c[i]) <= 10.0 for i in range(3)))
+
+        print(f"\n  old centre is {d_old:6.2f} A from the pocket; "
+              f"{inside_old}/{len(coords)} reference atoms inside a 20 A box")
+        print(f"  new centre is {d_new:6.2f} A from the pocket; "
+              f"{inside_new}/{len(coords)} reference atoms inside a {size:.1f} A box")
+
+        if d_new > 0.05:
+            failures.append(f"{target}: box centre {d_new:.2f} A from the pocket")
+        if inside_new != len(coords):
+            failures.append(f"{target}: box holds only {inside_new}/{len(coords)} "
+                            f"reference atoms")
+        if info["source"] != "config:ligand_resname":
+            failures.append(f"{target}: expected the pinned reference ligand, "
+                            f"got {info['source']}")
+
+    print("\n" + "=" * 72)
+    if failures:
+        print("FAILED")
+        for f in failures:
+            print("  - " + f)
+        return 1
+    print(f"PASSED — box centred on the pocket for all {len(CASES)} structures")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
