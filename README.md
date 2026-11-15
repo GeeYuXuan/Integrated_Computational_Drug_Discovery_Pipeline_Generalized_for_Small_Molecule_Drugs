@@ -193,8 +193,9 @@ spread across candidates is smaller than Vina's own error.
 
 ### Step 6 · Machine-learning prediction
 Trains a Random Forest on Morgan fingerprints over the **full measured potency
-range**. Reports a random split, a **scaffold split** (the honest estimate) and a
-mean-only baseline, and scores every candidate for **applicability domain**.
+range**. Reports a random split, **repeated scaffold splits** (mean ± sd, the
+honest estimate) and a mean-only baseline, and scores every candidate for
+**applicability domain**.
 
 **Outputs** `{target}_candidate_predictions.csv`, `{target}_pIC50_model.pkl`,
 `{target}_model_metrics.json`, `{target}_model_performance.png`,
@@ -221,9 +222,18 @@ verifies that each expected artifact exists.
 
 ## ⚠️ Limitations
 
-**The potency model is weak, by construction.** Published R² values are 0.29 (KRAS),
-0.41 (EGFR) and 0.46 (mTOR) on random splits. Scaffold splits are lower. Treat a
-predicted IC₅₀ as "plausibly active", never as a number.
+**The potency model is modest, and a single split does not pin it down.** The
+January runs reached R² of 0.29 (KRAS), 0.41 (EGFR) and 0.46 (mTOR) on random
+splits. Training across the full potency range lifted KRAS to **0.61** on a live
+re-run. Treat a predicted IC₅₀ as "plausibly active", never as a number.
+
+Scaffold splits — holding out whole Bemis–Murcko scaffolds — are the harder and
+more honest test, but **one draw is not an estimate**. The first live KRAS run
+drew a scaffold split of 0.794 against a random split of 0.614, which is the wrong
+way round and was mostly the draw. Step 6 therefore repeats the split
+`scaffold_split_repeats` times (default 10) and reports mean ± sd, flagging the
+estimate as unstable when the repeats disagree. Quote the mean with its spread;
+never quote the best draw.
 
 **Predictions on generated candidates may carry no signal.** Generation starts from
 bare scaffolds, which sit outside the chemistry the model was trained on. A random
