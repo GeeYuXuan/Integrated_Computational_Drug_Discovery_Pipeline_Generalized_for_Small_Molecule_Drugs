@@ -98,7 +98,11 @@ SHARED = {
     # --- environment ---
     "base_dir": "/content",             # Colab; set PIPELINE_BASE_DIR to override
     "random_seed": 42,
-    "entrez_email": "your.email@example.com",  # <-- put YOUR address here (NCBI requires it)
+    # NCBI's E-utilities policy asks automated clients to identify themselves with a
+    # working contact address, so they can email you rather than block your IP. It is
+    # not a credential and needs no registration. Override with the PIPELINE_ENTREZ_EMAIL
+    # environment variable if you are running this as someone else.
+    "entrez_email": os.environ.get("PIPELINE_ENTREZ_EMAIL", "yuxuan.gee@u.nus.edu"),
 
     # --- Step 1: data acquisition ---------------------------------------------
     # Compounds kept as "potent hits" for scaffold analysis and seed selection.
