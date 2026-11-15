@@ -113,6 +113,39 @@ check("-inf nested -> null", safe["c"]["d"] is None)
 check("strings and ints survive", safe["e"] == "ok" and safe["f"] == 3)
 check("strict parser accepts the output", json.loads(text)["a"] is None)
 
+print("\n--- summarise_scores / estimate_is_stable ---")
+s = pc.summarise_scores([0.60, 0.62, 0.64, 0.58, 0.61])
+check("mean over repeats", abs(s["mean"] - 0.61) < 1e-9, s["mean"])
+# sample sd: deviations -0.01, 0.01, 0.03, -0.03, 0.00 -> sqrt(0.002/4)
+check("sd uses the sample (n-1) formula", abs(s["sd"] - 0.02236068) < 1e-7, s["sd"])
+check("min/max recorded", s["min"] == 0.58 and s["max"] == 0.64)
+check("n counted", s["n"] == 5)
+check("per-split values kept", s["values"] == [0.6, 0.62, 0.64, 0.58, 0.61], s["values"])
+check("NaN and None skipped",
+      pc.summarise_scores([1.0, None, float("nan"), 2.0])["n"] == 2)
+check("all-unusable input -> None", pc.summarise_scores([None, float("nan")]) is None)
+check("single value gives sd 0", pc.summarise_scores([0.5])["sd"] == 0.0)
+
+check("a tight set of repeats is stable",
+      pc.estimate_is_stable(pc.summarise_scores([0.60, 0.62, 0.64, 0.58, 0.61])))
+# The spread that motivated this change: one draw said 0.794, another 0.614.
+check("a spread spanning 0.794 to 0.21 is NOT stable",
+      not pc.estimate_is_stable(pc.summarise_scores([0.794, 0.21, 0.55, 0.38])))
+check("a single draw is never stable",
+      not pc.estimate_is_stable(pc.summarise_scores([0.794])))
+check("None summary is not stable", not pc.estimate_is_stable(None))
+check("sd just over the limit fails",
+      not pc.estimate_is_stable({"n": 5, "sd": 0.11, "min": 0.5, "max": 0.6}))
+check("range just over the limit fails",
+      not pc.estimate_is_stable({"n": 5, "sd": 0.02, "min": 0.4, "max": 0.7}))
+
+print("\n--- scaffold_split_repeats is configured and shared ---")
+check("repeats > 1 (a single draw is what we are fixing)",
+      int(pc.SHARED["scaffold_split_repeats"]) > 1,
+      pc.SHARED["scaffold_split_repeats"])
+check("every target inherits the same repeat count",
+      len({cfgs[t]["scaffold_split_repeats"] for t in cfgs}) == 1)
+
 print("\n--- ligand_efficiency ---")
 check("LE = -affinity/heavy atoms",
       abs(pc.ligand_efficiency(-8.0, 32) - 0.25) < 1e-9,

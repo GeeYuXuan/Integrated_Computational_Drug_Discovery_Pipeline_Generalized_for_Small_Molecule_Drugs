@@ -34,6 +34,7 @@ __all__ = [
     "fit_box_size", "write_receptor",
     "find_vina_binary", "parse_vina_poses", "dock_with_vina_cli",
     "normalize_fixed", "spread_is_meaningful", "ligand_efficiency",
+    "summarise_scores", "estimate_is_stable",
     "inchikey", "is_peptide_like", "morgan_fp", "max_tanimoto_to_training",
     "json_safe",
 ]
@@ -149,6 +150,10 @@ SHARED = {
     "test_size": 0.2,
     "n_estimators": 500,
     "cv_folds": 5,
+    # Scaffold splits are repeated, not drawn once. A single draw gave R2 = 0.794
+    # against a random-split 0.614 on the first live KRAS run -- the wrong way
+    # round, and a sign the split choice was doing the work.
+    "scaffold_split_repeats": 10,
     # A candidate less similar than this to anything in the training set is outside
     # the model's applicability domain and its prediction is not trustworthy.
     "applicability_min_tanimoto": 0.40,
@@ -772,6 +777,52 @@ def spread_is_meaningful(values, error, factor: float = 2.0) -> bool:
     if len(clean) < 2 or not error:
         return False
     return (max(clean) - min(clean)) >= factor * float(error)
+
+
+def summarise_scores(values) -> dict | None:
+    """mean / sd / min / max over repeated train-test splits.
+
+    One split is a single draw from a wide distribution, and quoting it invites
+    quoting a lucky number. The first live KRAS run made the point: a single
+    scaffold split returned R2 = 0.794 while the random split returned 0.614 --
+    backwards, since scaffold splits are normally the harder test. Repeating the
+    split and reporting the spread says how much of that was the draw.
+    """
+    clean = []
+    for v in values:
+        try:
+            if v is None or v != v:          # None or NaN
+                continue
+            clean.append(float(v))
+        except (TypeError, ValueError):
+            continue
+    if not clean:
+        return None
+    n = len(clean)
+    mean = sum(clean) / n
+    sd = (sum((v - mean) ** 2 for v in clean) / (n - 1)) ** 0.5 if n > 1 else 0.0
+    return {
+        "mean": mean,
+        "sd": sd,
+        "min": min(clean),
+        "max": max(clean),
+        "n": n,
+        "values": [round(v, 4) for v in clean],
+    }
+
+
+def estimate_is_stable(summary: dict | None, max_sd: float = 0.10,
+                       max_range: float = 0.25) -> bool:
+    """True when repeated splits agree closely enough to quote one number.
+
+    Defaults are chosen for R2: an sd above 0.10, or a best-to-worst range above
+    0.25, means the split choice moves the answer more than most people would
+    accept in a reported figure.
+    """
+    if not summary or summary.get("n", 0) < 2:
+        return False
+    return (summary["sd"] <= max_sd
+            and (summary["max"] - summary["min"]) <= max_range)
 
 
 def ligand_efficiency(affinity: float, heavy_atoms: int):
