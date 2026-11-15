@@ -146,6 +146,40 @@ check("repeats > 1 (a single draw is what we are fixing)",
 check("every target inherits the same repeat count",
       len({cfgs[t]["scaffold_split_repeats"] for t in cfgs}) == 1)
 
+print("\n--- the metrics dict Step 6 writes survives the round trip Step 8 reads ---")
+# Mirrors how Step 6 builds `scaf`, using the ten R2 values measured on the live
+# KRAS run (mean 0.613, sd 0.100, range 0.468-0.794).
+live_r2 = [0.468, 0.541, 0.573, 0.598, 0.612, 0.627, 0.651, 0.678, 0.713, 0.794]
+live_rmse = [0.70, 0.66, 0.64, 0.63, 0.62, 0.61, 0.60, 0.59, 0.57, 0.55]
+r2_sum, rmse_sum = pc.summarise_scores(live_r2), pc.summarise_scores(live_rmse)
+scaf = {
+    "r2": r2_sum["mean"], "rmse": rmse_sum["mean"],
+    "r2_sd": r2_sum["sd"], "rmse_sd": rmse_sum["sd"],
+    "r2_min": r2_sum["min"], "r2_max": r2_sum["max"],
+    "r2_per_split": r2_sum["values"], "n_repeats": r2_sum["n"],
+    "n_test": 105, "stable": pc.estimate_is_stable(r2_sum),
+}
+metrics = {"random_split": {"r2": 0.614, "rmse": 0.748, "mae": 0.576, "n_test": 111},
+           "scaffold_split": scaf, "cv_r2_mean": 0.622, "cv_r2_std": 0.161,
+           "mean_only_baseline_rmse": 1.214, "potency_rankable": False}
+
+text = json.dumps(pc.json_safe(metrics), indent=2, allow_nan=False)   # Step 6 writes
+reloaded = json.loads(text)                                          # Step 8 reads
+scf = reloaded.get("scaffold_split") or {}
+check("metrics JSON is strictly valid", isinstance(reloaded, dict))
+check("Step 8 reads scaffold_split_r2 (the mean)",
+      abs(scf.get("r2") - 0.6255) < 1e-9, scf.get("r2"))
+check("Step 8 reads scaffold_split_r2_sd", scf.get("r2_sd") is not None)
+check("Step 8 reads scaffold_split_repeats", scf.get("n_repeats") == 10)
+check("Step 8 reads scaffold_split_stable as a bool",
+      isinstance(scf.get("stable"), bool))
+check("this spread is correctly judged UNSTABLE", scf.get("stable") is False)
+check("legacy keys 'r2'/'rmse' still present for old readers",
+      "r2" in scf and "rmse" in scf)
+check("per-split values preserved", len(scf.get("r2_per_split", [])) == 10)
+check("0.794 is the max, not the mean",
+      scf["r2_max"] == 0.794 and scf["r2"] < scf["r2_max"])
+
 print("\n--- ligand_efficiency ---")
 check("LE = -affinity/heavy atoms",
       abs(pc.ligand_efficiency(-8.0, 32) - 0.25) < 1e-9,
