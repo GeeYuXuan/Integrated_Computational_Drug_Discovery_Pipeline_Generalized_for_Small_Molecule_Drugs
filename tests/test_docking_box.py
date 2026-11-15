@@ -136,5 +136,10 @@ def main():
     return 0
 
 
+def test_box_regression():
+    """Entry point for `pytest`; main() returns 0 only if every case passed."""
+    assert main() == 0
+
+
 if __name__ == "__main__":
     sys.exit(main())

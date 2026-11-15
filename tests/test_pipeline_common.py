@@ -213,4 +213,18 @@ check("empty centroid raises", _try(lambda: pc.centroid([])))
 
 print("\n" + "=" * 60)
 print(f"PASSED {passed}   FAILED {failed}")
-sys.exit(1 if failed else 0)
+
+
+def test_all():
+    """Entry point for `pytest`.
+
+    The checks above run at import time, so by the time pytest calls this the
+    counters are final. Without this function -- and with the sys.exit() below
+    left unguarded -- pytest aborted collection with `SystemExit: 0` even though
+    every check had passed.
+    """
+    assert failed == 0, f"{failed} of {passed + failed} checks failed"
+
+
+if __name__ == "__main__":
+    sys.exit(1 if failed else 0)
