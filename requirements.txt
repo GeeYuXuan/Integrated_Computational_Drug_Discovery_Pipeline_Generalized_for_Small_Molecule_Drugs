@@ -1,0 +1,51 @@
+# Python dependencies for the Integrated Computational Drug Discovery Pipeline.
+#
+# Version floors, not exact pins: these are the versions whose APIs the pipeline
+# uses. Step 0 of the notebook installs these on Colab.
+#
+#   pip install -r requirements.txt
+#
+# RDKit >= 2023.03 is required: Steps 2, 4 and 6 use rdFingerprintGenerator, which
+# replaced the deprecated AllChem.GetMorganFingerprintAsBitVect and does not exist
+# in earlier releases.
+rdkit>=2023.3.1
+
+# NOTE: the `vina` PYTHON package is deliberately NOT listed.
+#
+# It publishes no wheel for Python 3.13 -- which is what Google Colab now runs --
+# and building it from source there fails ("Failed building wheel for vina").
+# Docking instead drives the `vina` EXECUTABLE from the autodock-vina system
+# package (see the system-binaries note at the bottom). Same engine, same
+# affinities, no Python-version dependency.
+#
+# If you are on Python <= 3.12 and prefer the bindings, `pip install vina>=1.2.5`
+# still works; the pipeline does not use them either way.
+
+chembl_webresource_client>=0.10.8
+biopython>=1.81
+pandas>=1.5
+numpy>=1.23
+scikit-learn>=1.2
+scipy>=1.9
+matplotlib>=3.6
+seaborn>=0.12
+joblib>=1.2
+requests>=2.28
+
+# Step 5b only (interactive 3D pose viewer); the pipeline runs without it.
+py3Dmol>=2.0
+
+# ---------------------------------------------------------------------------
+# System binaries, NOT installable with pip:
+#
+#   openbabel        file-format conversion (PDB <-> PDBQT)
+#   autodock-vina    docking engine
+#
+# Colab / Debian / Ubuntu:
+#   apt-get install -y openbabel autodock-vina
+# macOS:
+#   brew install open-babel autodock-vina
+#
+# The tests in tests/ need none of the above -- they use only the standard
+# library, so they run on a bare Python install.
+# ---------------------------------------------------------------------------
