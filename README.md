@@ -10,11 +10,14 @@ and evaluates them by molecular docking, machine learning and multi-parameter
 optimisation.
 
 > ### ⚠️ Read this before using any number from this pipeline
-> Everything here is a **computational hypothesis**, not a measurement. The potency
-> model reaches an R² of roughly 0.3–0.5 on held-out data, and docking scores carry
-> an error of about 2.85 kcal/mol. Candidates are starting points for synthesis and
-> assay — they are not predicted drugs. See [Limitations](#️-limitations) for the
-> specific things this pipeline cannot tell you.
+> Everything here is a **computational hypothesis**, not a measurement. On the KRAS
+> re-run the potency model reaches an R² of 0.61 on a random split and 0.61 ± 0.10
+> across ten scaffold splits; the earlier EGFR and mTOR runs, trained on a truncated
+> potency range, reached 0.3–0.5. Docking scores carry an error of about
+> 2.85 kcal/mol — larger than the spread between most candidates a run produces, in
+> which case the pipeline withholds the term rather than ranking on it. Candidates
+> are starting points for synthesis and assay — they are not predicted drugs. See
+> [Limitations](#️-limitations) for the specific things this pipeline cannot tell you.
 
 ---
 
