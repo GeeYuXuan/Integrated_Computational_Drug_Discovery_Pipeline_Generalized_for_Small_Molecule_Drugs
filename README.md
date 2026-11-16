@@ -144,6 +144,13 @@ python tests/test_docking_box.py
 python tests/test_pipeline_common.py
 ```
 
+```bash
+python tests/test_review_fixes.py
+```
+
+`test_review_fixes.py` needs Biopython for its pocket check and skips that one
+check without it.
+
 ---
 
 ## 🔬 Pipeline steps
@@ -284,6 +291,37 @@ hypothesis-generation project.
 ---
 
 ## 🔧 What changed, and why
+
+### Second review, 17 November 2026
+
+A peer review of the KRAS report checked every reported figure against the
+deposited outputs and the code behind them. Seven code defects came out of it.
+None changes a docking affinity or a model metric, but five change numbers that
+were reported, and the report has been corrected to match.
+
+| Issue | Effect | Fix |
+|---|---|---|
+| **Only the first assay id survived aggregation** | Every "unique assays" figure was an undercount — 16 reported against 25 real for the curated set, 11 against 17 for the potent subset — and the dominant-assay share was computed over compounds rather than measurements | Carry `n_assays` per compound and take any dataset-level count from `{target}_measurements.csv` ([`test_review_fixes.py`](tests/test_review_fixes.py)) |
+| **Pocket residues counted waters, around the wrong ligand** | Biopython marks waters `W`, not `H_`, so they passed the protein filter; and `ligands[0]` is GDP in 7RT1, not the inhibitor. "37 pocket residues" was 24 protein residues + 13 waters around a different site | Pin the reference to `ligand_resname`, exclude waters, report both counts |
+| **Resolution parser returned the remark number** | `REMARK   2 RESOLUTION.    1.27 ANGSTROMS.` was read as 2.0 Å, for every structure | Take the token after `RESOLUTION`, never the first float on the line |
+| **Receptor converted with no hydrogens and no charges** | The deposited `7RT1_receptor.pdbqt` has 1,367 atoms, 0 hydrogens and every partial charge 0.000, while the Methods claimed protonation at pH 7.4 with assigned charges | Pass `-p 7.4 --partialcharge gasteiger`, then verify the written file and say so loudly if it still has neither |
+| **Novelty measured against the potent subset only** | A generated molecule identical to one of the weaker curated compounds was reported as novel | Build the reference from `{target}_bioactivity_full.csv` |
+| **Applicability domain measured against all 552** | Includes the 20 % the model never saw, so the domain looks wider than it is | Compare against the training partition |
+| **Effective weights and dropped terms never exported** | `Scoring_Dropped_Terms` was computed and printed but written to no file, so the CSVs gave no sign that two of five terms had been withheld | Export the column with both tables and write `{target}_scoring_weights.json` |
+
+`TSNE(n_iter=)` was also replaced with `max_iter` (renamed in scikit-learn 1.5,
+removed in 1.7).
+
+**The deposited `kras_project_backup_16Nov26/` predates these fixes.** Its
+docking affinities came from the unprotonated, uncharged receptor; its
+`structural_analysis.json` holds the 37-residue count; its CSVs carry no
+dropped-terms column. The figures the report quotes are the deposited ones,
+which is why the report states the receptor limitation rather than hiding it. A
+re-run on the fixed code will differ in the pocket count, the assay counts, the
+applicability-domain margins and the exported columns, and may differ slightly
+in affinity.
+
+### First review, November 2026
 
 A review in November 2026 found four issues serious enough to invalidate results.
 All are fixed; each fix is covered by a test.
