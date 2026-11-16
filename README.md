@@ -118,7 +118,13 @@ box sat 37.7 Å from the binding site. Re-run the pipeline to regenerate them.
 ### Running the tests
 
 No RDKit or Vina needed — the tests use only the standard library and the committed
-PDB files:
+PDB files. Run both suites at once:
+
+```bash
+python -m pytest tests/ -q
+```
+
+Or run either on its own, which prints every individual check:
 
 ```bash
 python tests/test_docking_box.py

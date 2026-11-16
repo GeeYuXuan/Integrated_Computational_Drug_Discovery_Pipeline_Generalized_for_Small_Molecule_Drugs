@@ -134,7 +134,13 @@ SHARED = {
     "box_size": 22.0,                   # minimum box edge, grown to fit the ligand
     "box_padding": 5.0,                 # A of clearance per side around the reference
     "box_size_max": 40.0,               # refuse to grow beyond this
-    "exhaustiveness": 16,               # 8 is Vina's floor, not a good default
+    # Vina's own default (its floor is 1, not 8). Doubling it to 16 doubles the
+    # docking time and buys nothing you can act on here: the 20 candidates land
+    # within ~0.5 kcal/mol of each other, far inside Vina's ~2.85 kcal/mol scoring
+    # error, so the ordering is noise at either setting. The shorter cell also
+    # matters operationally -- a 60-minute docking cell was killed outright by a
+    # Colab idle disconnect, losing the whole run.
+    "exhaustiveness": 8,
     "num_modes": 9,                     # >1 so pose convergence can be inspected
     # Docking runs through the `vina` executable, not the Python bindings, which
     # have no wheel for Python 3.13 (what Colab now runs). None = find it on PATH.
@@ -704,7 +710,7 @@ def dock_with_vina_cli(receptor_pdbqt, ligand_pdbqt, center, box_size, out_pose,
         "--size_x", f"{box_size:.3f}",
         "--size_y", f"{box_size:.3f}",
         "--size_z", f"{box_size:.3f}",
-        "--exhaustiveness", str(int(cfg.get("exhaustiveness", 16))),
+        "--exhaustiveness", str(int(cfg.get("exhaustiveness", 8))),
         "--num_modes", str(int(cfg.get("num_modes", 9))),
         "--seed", str(int(cfg.get("random_seed", 42))),
         "--out", str(out_pose),
