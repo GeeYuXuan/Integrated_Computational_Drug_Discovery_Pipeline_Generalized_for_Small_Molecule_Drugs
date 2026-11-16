@@ -173,10 +173,50 @@ def check_assay_counts():
     return failures
 
 
+# ------------------------------------------------------------------ receptor
+def check_receptor_flags():
+    """`-p 7.4` must add hydrogens; `--partialcharge gasteiger` must not be used.
+
+    Measured with Open Babel 3.1.0: `-xr` alone gives 1367 atoms and 0
+    hydrogens, `-xr -p 7.4` gives 1662 atoms and 295 polar hydrogens, and
+    `--partialcharge gasteiger` makes the conversion emit zero molecules. The
+    charge column stays "+0.000" either way, so nothing in the pipeline may
+    claim the receptor is charge-assigned.
+    """
+    src = None
+    for s in _notebook_sources():
+        if "RECEPTOR_PDBQT" in s and "obabel" in s:
+            src = s
+            break
+    if src is None:
+        return ["receptor preparation cell not found"]
+
+    m = re.search(r"\[\s*'obabel'[^\]]*RECEPTOR_PDBQT[^\]]*\]", src, re.S)
+    call = m.group(0) if m else ""
+    print(f"  obabel call: {' '.join(call.split())[:100]}")
+
+    # Only the argument list is inspected. The surrounding comment names
+    # --partialcharge precisely to record why it must not be passed, so a
+    # whole-cell search would flag the explanation as the defect.
+    failures = []
+    if "--partialcharge" in call:
+        failures.append("receptor prep passes --partialcharge, which makes "
+                        "Open Babel emit zero molecules")
+    if "'-p'" not in call or "'7.4'" not in call:
+        failures.append("receptor prep no longer passes -p 7.4, so the "
+                        "receptor reaches Vina with no hydrogens")
+    if "Kollman" in src:
+        failures.append("receptor prep claims Kollman charges it does not assign")
+    print(f"  passes -p 7.4: {chr(39) + '-p' + chr(39) in call}   "
+          f"avoids --partialcharge: {'--partialcharge' not in call}")
+    return failures
+
+
 CHECKS = [
     ("PDB RESOLUTION PARSER", check_resolution),
     ("POCKET RESIDUES AND WATERS", check_pocket),
     ("ASSAY COUNTS", check_assay_counts),
+    ("RECEPTOR PREPARATION FLAGS", check_receptor_flags),
 ]
 
 

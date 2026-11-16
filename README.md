@@ -304,13 +304,53 @@ were reported, and the report has been corrected to match.
 | **Only the first assay id survived aggregation** | Every "unique assays" figure was an undercount — 16 reported against 25 real for the curated set, 11 against 17 for the potent subset — and the dominant-assay share was computed over compounds rather than measurements | Carry `n_assays` per compound and take any dataset-level count from `{target}_measurements.csv` ([`test_review_fixes.py`](tests/test_review_fixes.py)) |
 | **Pocket residues counted waters, around the wrong ligand** | Biopython marks waters `W`, not `H_`, so they passed the protein filter; and `ligands[0]` is GDP in 7RT1, not the inhibitor. "37 pocket residues" was 24 protein residues + 13 waters around a different site | Pin the reference to `ligand_resname`, exclude waters, report both counts |
 | **Resolution parser returned the remark number** | `REMARK   2 RESOLUTION.    1.27 ANGSTROMS.` was read as 2.0 Å, for every structure | Take the token after `RESOLUTION`, never the first float on the line |
-| **Receptor converted with no hydrogens and no charges** | The deposited `7RT1_receptor.pdbqt` has 1,367 atoms, 0 hydrogens and every partial charge 0.000, while the Methods claimed protonation at pH 7.4 with assigned charges | Pass `-p 7.4 --partialcharge gasteiger`, then verify the written file and say so loudly if it still has neither |
+| **Receptor converted with no hydrogens and no charges** | The deposited `7RT1_receptor.pdbqt` has 1,367 atoms, 0 hydrogens and every partial charge 0.000, while the Methods claimed protonation at pH 7.4 with assigned charges | Pass `-p 7.4`, then verify the written file and say so loudly if it still has no hydrogens. Charges are a separate problem — see below |
 | **Novelty measured against the potent subset only** | A generated molecule identical to one of the weaker curated compounds was reported as novel | Build the reference from `{target}_bioactivity_full.csv` |
 | **Applicability domain measured against all 552** | Includes the 20 % the model never saw, so the domain looks wider than it is | Compare against the training partition |
 | **Effective weights and dropped terms never exported** | `Scoring_Dropped_Terms` was computed and printed but written to no file, so the CSVs gave no sign that two of five terms had been withheld | Export the column with both tables and write `{target}_scoring_weights.json` |
 
 `TSNE(n_iter=)` was also replaced with `max_iter` (renamed in scikit-learn 1.5,
 removed in 1.7).
+
+### What the verification re-run found
+
+The whole pipeline was then re-run on the fixed code to check the fixes in
+place. Three portability bugs surfaced that Colab had hidden, all now fixed:
+Step 4 shelled out to `wget` (absent on Windows and macOS) for the SA-score
+table; eight `open()` calls had no explicit `encoding`, so Step 3 died writing
+PubMed abstracts under a cp1252 locale; and `--partialcharge gasteiger` turned
+out to make Open Babel emit **zero molecules**.
+
+Measured against Open Babel 3.1.0 on `7RT1_clean.pdb`:
+
+| obabel arguments | atoms | hydrogens | non-zero charges |
+|---|---|---|---|
+| `-xr` (as deposited) | 1367 | 0 | 0 |
+| `-xr -p 7.4` (now) | 1662 | 295 | 0 |
+| `-xr --partialcharge gasteiger` | — | — | conversion fails |
+
+So `-p 7.4` does add the polar hydrogens, but **this Open Babel's PDBQT writer
+emits `+0.000` for every atom whatever it is asked**. Real partial charges need
+`prepare_receptor4.py` (ADFR), which this pipeline does not run. The report
+says so rather than implying otherwise.
+
+**Docking reproducibility.** Re-docking the same 20 ligands against the *same*
+unprotonated receptor with a different Vina build (1.2.7 vs Colab's apt
+package) moved the mean by −0.010 kcal/mol but individual scores by up to
+**0.45 kcal/mol**, reshuffling **25% of all pairwise rankings**. The candidate
+set's entire spread is 0.83 kcal/mol. Adding the 295 polar hydrogens, by
+contrast, was a near-uniform −0.364 kcal/mol offset that left 85% of pairwise
+rankings intact. Run-to-run search noise, not the receptor, is what makes these
+affinities unrankable — measured on this system rather than argued from Vina's
+published ~2.85 kcal/mol error.
+
+**Everything that matters reproduced.** Steps 1-4 are identical to the deposit
+to within 1e-14 (897 measurements, 552 compounds, spread 1.92/3.79, 41
+scaffolds, 15 seeds, 70 candidates, the same top 20). The final five
+candidates, their order and their consensus scores are unchanged;
+`Consensus_Score = 0.5 x QED + 0.5` still holds exactly; Potency and Docking
+are still both dropped as noise; and all 20 candidates remain inside the
+applicability domain even under the stricter training-partition test.
 
 **The deposited `kras_project_backup_16Nov26/` predates these fixes.** Its
 docking affinities came from the unprotonated, uncharged receptor; its
