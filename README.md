@@ -153,9 +153,16 @@ salts and peptides, and collapses repeat measurements by **median**.
 Reports assay provenance and warns when one assay dominates the dataset.
 
 **Outputs**
+- `{target}_measurements.csv` — the measurement-level table, written **before** the medians
+  are taken. One row per ChEMBL measurement, so the inter-assay disagreement the step reports
+  can be recomputed by anyone holding only the results. Without it the aggregation is a
+  one-way door.
 - `{target}_bioactivity_full.csv` — all curated compounds, full potency range → used for ML training
 - `{target}_inhibitors_cleaned.csv` — the potent subset (IC₅₀ < `potency_cutoff_nm`) → used for SAR and seeds
 - `{target}_pic50_distribution.png`
+
+Both aggregate files carry `ic50_min_nm` and `ic50_max_nm` alongside the median, so the
+per-compound spread is available without loading the measurement table.
 
 ### Step 2 · SAR and scaffold analysis
 Computes descriptors (MW, LogP, TPSA, HBD, HBA, QED), performs Bemis–Murcko scaffold
