@@ -100,9 +100,9 @@ trusting the scores.
 │   ├── test_docking_box.py                      box-centring regression test
 │   └── test_pipeline_common.py                  config + scoring guard tests
 ├── Computational Discovery of Novel KRAS Inhibitors.pdf   write-up of the KRAS run
-├── kras_project_backup_15Jan26/                 example outputs — KRAS G12D
-├── egfr_project_backup_16Jan26/                 example outputs — EGFR
-└── mtor_project_backup_16Jan26/                 example outputs — mTOR
+├── kras_project_backup_16Nov26/                 example outputs — KRAS G12D (current)
+├── egfr_project_backup_16Jan26/                 example outputs — EGFR (pre-fix)
+└── mtor_project_backup_16Jan26/                 example outputs — mTOR (pre-fix)
 ```
 
 Each `*_project_backup_*` folder holds one complete run:
@@ -113,10 +113,16 @@ Each `*_project_backup_*` folder holds one complete run:
 └── figures/          every plot
 ```
 
-**The committed example outputs were produced before the fixes listed in
-[What changed](#-what-changed-and-why) and are kept for comparison.** In particular
-the mTOR docking scores in `mtor_project_backup_16Jan26/` are invalid — the search
-box sat 37.7 Å from the binding site. Re-run the pipeline to regenerate them.
+`kras_project_backup_16Nov26/` is the reference run for the current code. It was
+produced after every fix listed in [What changed](#-what-changed-and-why), and the
+figures and tables in the PDF write-up come from it. It also carries
+`results/kras_measurements.csv`, the measurement-level table behind the provenance
+figures, so the inter-assay spread can be recomputed from the deposit alone.
+
+**The EGFR and mTOR folders predate those fixes and are kept only for comparison —
+do not quote numbers from them.** In particular the mTOR docking scores in
+`mtor_project_backup_16Jan26/` are invalid: the search box sat 37.7 Å from the
+binding site. Re-run the pipeline to regenerate them.
 
 ### Running the tests
 

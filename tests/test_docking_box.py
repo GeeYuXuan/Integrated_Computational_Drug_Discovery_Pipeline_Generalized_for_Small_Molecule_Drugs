@@ -27,7 +27,7 @@ import pipeline_common as pc  # noqa: E402
 
 # (target, structure, true pocket centre = centroid of ONE reference ligand copy)
 CASES = [
-    ("kras", "kras_project_backup_15Jan26/workflow/data/7RT1.pdb", (1.58, 4.75, -23.51)),
+    ("kras", "kras_project_backup_16Nov26/workflow/data/7RT1.pdb", (1.58, 4.75, -23.51)),
     ("egfr", "egfr_project_backup_16Jan26/workflow/data/5Y9T.pdb", (-0.46, 49.56, -17.66)),
     ("mtor", "mtor_project_backup_16Jan26/workflow/data/4JSV.pdb", (50.12, -1.80, -45.90)),
 ]
@@ -56,7 +56,7 @@ def check_pose_parser():
     """
     import csv
     checked = mismatched = 0
-    for target, backup in (("kras", "kras_project_backup_15Jan26"),
+    for target, backup in (("kras", "kras_project_backup_16Nov26"),
                            ("egfr", "egfr_project_backup_16Jan26"),
                            ("mtor", "mtor_project_backup_16Jan26")):
         results = ROOT / backup / "results" / f"{target}_docking_results.csv"
