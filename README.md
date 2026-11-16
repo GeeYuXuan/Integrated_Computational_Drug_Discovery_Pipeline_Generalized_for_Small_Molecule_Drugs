@@ -97,15 +97,14 @@ trusting the scores.
 ├── pipeline_common.py                          shared config + helpers  ← edit this
 ├── requirements.txt                             pinned dependency floors
 ├── tests/
+│   ├── data/                                    KRAS, EGFR and mTOR structures
 │   ├── test_docking_box.py                      box-centring regression test
 │   └── test_pipeline_common.py                  config + scoring guard tests
 ├── Computational Discovery of Novel KRAS Inhibitors.pdf   write-up of the KRAS run
-├── kras_project_backup_16Nov26/                 example outputs — KRAS G12D (current)
-├── egfr_project_backup_16Jan26/                 example outputs — EGFR (pre-fix)
-└── mtor_project_backup_16Jan26/                 example outputs — mTOR (pre-fix)
+└── kras_project_backup_16Nov26/                 example outputs — KRAS G12D
 ```
 
-Each `*_project_backup_*` folder holds one complete run:
+The backup folder holds one complete run:
 
 ```
 ├── workflow/data/    the PDB structure and the prepared receptor
@@ -119,15 +118,17 @@ figures and tables in the PDF write-up come from it. It also carries
 `results/kras_measurements.csv`, the measurement-level table behind the provenance
 figures, so the inter-assay spread can be recomputed from the deposit alone.
 
-**The EGFR and mTOR folders predate those fixes and are kept only for comparison —
-do not quote numbers from them.** In particular the mTOR docking scores in
-`mtor_project_backup_16Jan26/` are invalid: the search box sat 37.7 Å from the
-binding site. Re-run the pipeline to regenerate them.
+The earlier EGFR and mTOR example outputs have been **removed**: they predated the
+box, potency-cutoff and training-range fixes, so every number in them was
+superseded — the mTOR search box alone sat 37.7 Å from the binding site. Their
+crystal structures are kept in `tests/data/`, because those are RCSB inputs rather
+than pipeline results and the box regression still checks all three. To regenerate
+either target, set `ACTIVE_TARGET` in `pipeline_common.py` and run the notebook.
 
 ### Running the tests
 
-No RDKit or Vina needed — the tests use only the standard library and the committed
-PDB files. Run both suites at once:
+No RDKit or Vina needed — the tests use only the standard library, the structures in
+`tests/data/` and the committed KRAS poses. Run both suites at once:
 
 ```bash
 python -m pytest tests/ -q

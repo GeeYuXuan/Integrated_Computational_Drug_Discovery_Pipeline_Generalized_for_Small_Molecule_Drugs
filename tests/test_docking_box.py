@@ -25,11 +25,17 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 import pipeline_common as pc  # noqa: E402
 
+# Structures live in tests/data/ so this regression does not depend on which
+# example-output folders happen to be committed. They are unmodified RCSB
+# downloads — inputs to the pipeline, not results from it — which is why they
+# survive when a stale run is deleted.
+STRUCTURES = Path(__file__).resolve().parent / "data"
+
 # (target, structure, true pocket centre = centroid of ONE reference ligand copy)
 CASES = [
-    ("kras", "kras_project_backup_16Nov26/workflow/data/7RT1.pdb", (1.58, 4.75, -23.51)),
-    ("egfr", "egfr_project_backup_16Jan26/workflow/data/5Y9T.pdb", (-0.46, 49.56, -17.66)),
-    ("mtor", "mtor_project_backup_16Jan26/workflow/data/4JSV.pdb", (50.12, -1.80, -45.90)),
+    ("kras", "7RT1.pdb", (1.58, 4.75, -23.51)),
+    ("egfr", "5Y9T.pdb", (-0.46, 49.56, -17.66)),
+    ("mtor", "4JSV.pdb", (50.12, -1.80, -45.90)),
 ]
 
 
@@ -50,15 +56,16 @@ def check_pose_parser():
 
     Docking now runs through the `vina` executable rather than the `vina` Python
     package, which has no wheel for Python 3.13 (Colab's current interpreter).
-    Every committed pose file was produced by the bindings, so the affinity this
-    parser reads from `REMARK VINA RESULT:` must equal the affinity recorded in
-    the matching docking_results.csv.
+    The affinity this parser reads from `REMARK VINA RESULT:` must equal the
+    affinity recorded in the matching docking_results.csv.
+
+    Only the KRAS deposit is checked. The parser is target-agnostic, and the
+    EGFR and mTOR example outputs were removed because they predated the box,
+    cutoff and training-range fixes.
     """
     import csv
     checked = mismatched = 0
-    for target, backup in (("kras", "kras_project_backup_16Nov26"),
-                           ("egfr", "egfr_project_backup_16Jan26"),
-                           ("mtor", "mtor_project_backup_16Jan26")):
+    for target, backup in (("kras", "kras_project_backup_16Nov26"),):
         results = ROOT / backup / "results" / f"{target}_docking_results.csv"
         if not results.exists():
             continue
@@ -81,10 +88,10 @@ def check_pose_parser():
 
 def main():
     failures = []
-    for target, rel_path, expected in CASES:
-        path = ROOT / rel_path
+    for target, fname, expected in CASES:
+        path = STRUCTURES / fname
         if not path.exists():
-            print(f"SKIP {target}: {rel_path} not present")
+            print(f"SKIP {target}: tests/data/{fname} not present")
             continue
 
         print("\n" + "=" * 72)
