@@ -9,6 +9,8 @@ come back unnoticed:
   2. The pocket-residue count used whichever hetero group the file listed first
      (GDP in 7RT1, not the inhibitor) and counted ordered waters as protein
      residues, which turned 23 protein residues into "37 pocket residues".
+     The 17 Nov deposit records the corrected 23 + 16, so check_pocket both
+     recomputes it from the structure and confirms the deposit agrees.
   3. Step 1 kept only the first assay id per aggregated compound, so every
      "unique assays" figure downstream was an undercount.
 
@@ -27,7 +29,7 @@ DATA = Path(__file__).resolve().parent / "data"
 NOTEBOOK = ROOT / (
     "Integrated_Computational_Drug_Discovery_Pipeline_Generalized_for_Small_Molecule_Drugs.ipynb"
 )
-BACKUP = ROOT / "kras_project_backup_16Nov26"
+BACKUP = ROOT / "kras_project_backup_17Nov26"
 
 
 def _notebook_sources():
@@ -128,6 +130,26 @@ def check_pocket():
         failures.append(f"pocket: {len(near_p)} protein residues, expected 23")
     if len(near_w) != 16:
         failures.append(f"pocket: {len(near_w)} waters, expected 16")
+
+    # The deposit must agree with what the structure says, or the write-up and
+    # the data have drifted apart again.
+    sa = BACKUP / "results" / "kras_structural_analysis.json"
+    if sa.exists():
+        s = json.loads(sa.read_text(encoding="utf-8"))["structure"]
+        print(f"  deposit records: {s.get('pocket_residue_count')} residues, "
+              f"{s.get('pocket_water_count')} waters, "
+              f"reference {s.get('pocket_reference_ligand')}")
+        if s.get("pocket_residue_count") != 23:
+            failures.append(f"deposit pocket_residue_count is "
+                            f"{s.get('pocket_residue_count')}, expected 23")
+        if s.get("pocket_water_count") != 16:
+            failures.append(f"deposit pocket_water_count is "
+                            f"{s.get('pocket_water_count')}, expected 16")
+        if s.get("pocket_reference_ligand") != "7L8":
+            failures.append(f"deposit reference ligand is "
+                            f"{s.get('pocket_reference_ligand')}, expected 7L8")
+    else:
+        print("  SKIP deposit cross-check: structural_analysis.json not present")
     return failures
 
 

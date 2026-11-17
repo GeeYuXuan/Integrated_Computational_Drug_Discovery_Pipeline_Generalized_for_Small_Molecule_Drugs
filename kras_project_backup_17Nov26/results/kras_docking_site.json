@@ -1,0 +1,17 @@
+{
+  "pdb": "/content/workflow/data/7RT1.pdb",
+  "source": "config:ligand_resname",
+  "reference": "7L8/A/203",
+  "n_atoms": 38,
+  "extent": 13.66321052631579,
+  "n_copies": 2,
+  "box_center": [
+    1.5836052631578947,
+    4.748605263157895,
+    -23.50857894736842
+  ],
+  "box_size": 23.66321052631579,
+  "pdb_id": "7RT1",
+  "exhaustiveness": 8,
+  "num_modes": 9
+}

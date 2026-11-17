@@ -65,7 +65,7 @@ def check_pose_parser():
     """
     import csv
     checked = mismatched = 0
-    for target, backup in (("kras", "kras_project_backup_16Nov26"),):
+    for target, backup in (("kras", "kras_project_backup_17Nov26"),):
         results = ROOT / backup / "results" / f"{target}_docking_results.csv"
         if not results.exists():
             continue

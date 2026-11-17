@@ -101,7 +101,7 @@ trusting the scores.
 │   ├── test_docking_box.py                      box-centring regression test
 │   └── test_pipeline_common.py                  config + scoring guard tests
 ├── Computational Discovery of Novel KRAS Inhibitors.pdf   write-up of the KRAS run
-└── kras_project_backup_16Nov26/                 example outputs — KRAS G12D
+└── kras_project_backup_17Nov26/                 example outputs — KRAS G12D
 ```
 
 The backup folder holds one complete run:
@@ -112,11 +112,14 @@ The backup folder holds one complete run:
 └── figures/          every plot
 ```
 
-`kras_project_backup_16Nov26/` is the reference run for the current code. It was
-produced after every fix listed in [What changed](#-what-changed-and-why), and the
-figures and tables in the PDF write-up come from it. It also carries
-`results/kras_measurements.csv`, the measurement-level table behind the provenance
-figures, so the inter-assay spread can be recomputed from the deposit alone.
+`kras_project_backup_17Nov26/` is the reference run for the current code. It was
+produced on Colab, on 17 November 2026, after every fix listed in
+[What changed](#-what-changed-and-why), and the figures and tables in the PDF
+write-up come from it. It also carries `results/kras_measurements.csv`, the
+measurement-level table behind the provenance figures, so the repeat-measurement
+spread can be recomputed from the deposit alone, and
+`results/kras_scoring_weights.json`, which records the weights the ranking
+actually used after the noise-gated terms were dropped.
 
 The earlier EGFR and mTOR example outputs have been **removed**: they predated the
 box, potency-cutoff and training-range fixes, so every number in them was
@@ -352,14 +355,31 @@ candidates, their order and their consensus scores are unchanged;
 are still both dropped as noise; and all 20 candidates remain inside the
 applicability domain even under the stricter training-partition test.
 
-**The deposited `kras_project_backup_16Nov26/` predates these fixes.** Its
-docking affinities came from the unprotonated, uncharged receptor; its
-`structural_analysis.json` holds the 37-residue count; its CSVs carry no
-dropped-terms column. The figures the report quotes are the deposited ones,
-which is why the report states the receptor limitation rather than hiding it. A
-re-run on the fixed code will differ in the pocket count, the assay counts, the
-applicability-domain margins and the exported columns, and may differ slightly
-in affinity.
+**The deposit has been replaced.** `kras_project_backup_17Nov26/` is that Colab
+re-run; the previous `kras_project_backup_16Nov26/` predated these fixes and is
+available in this repository's history. Against it, the new deposit differs in
+exactly the places the fixes touch and nowhere else:
+
+| | 16 Nov deposit | 17 Nov deposit |
+|---|---|---|
+| Steps 1-4 (all CSVs) | — | **byte-identical** |
+| Model R2 / RMSE / MAE | 0.614 / 0.748 / 0.576 | **identical** |
+| All 20 predicted pIC50 | 5.644-6.101 | **identical** |
+| Final five and their scores | 08, 04, 03, 01, 11 | **identical** |
+| Pocket residues | 37 (GDP, waters counted) | 23 protein + 16 waters (7L8) |
+| Asp12 distance | 3.83 Å to GDP | 2.74 Å to 7L8 |
+| Resolution | 2.0 Å | 1.27 Å |
+| Receptor | 1367 atoms, 0 H | 1674 atoms, 307 polar H |
+| Exhaustiveness | 16 | 8 (the repository default) |
+| Docking mean / range | −7.872 / −8.27 to −7.43 | −8.248 / −9.06 to −7.82 |
+| Best candidate | candidate_13 | candidate_11 |
+| `scoring_weights.json` | absent | present |
+
+The conclusions are untouched: `Consensus_Score = 0.5 x QED + 0.5` still holds
+exactly, Potency and Docking are still both dropped as noise, and all 20
+candidates remain inside the applicability domain under the stricter
+training-partition test. Only the docking numbers and the structural analysis
+moved, which is what the receptor and pocket fixes were for.
 
 ### First review, November 2026
 

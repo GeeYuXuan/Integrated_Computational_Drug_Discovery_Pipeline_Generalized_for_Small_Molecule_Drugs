@@ -1,0 +1,206 @@
+{
+  "project_name": "KRAS Inhibitor Discovery via Computational Drug Design",
+  "completion_date": "2026-11-17",
+  "total_steps": 7,
+  "target": "kras",
+  "steps": {
+    "step_1_data_acquisition": {
+      "step_name": "Data Acquisition",
+      "description": "Retrieved KRAS inhibitor data from ChEMBL database",
+      "total_inhibitors": 99,
+      "pic50_min": 7.306712842994345,
+      "pic50_max": 9.69897000433602,
+      "pic50_mean": 8.35219513336784,
+      "pic50_median": 8.42021640338319,
+      "data_source": "ChEMBL Database",
+      "output_file": "results/kras_inhibitors_cleaned.csv"
+    },
+    "step_2_sar_analysis": {
+      "step_name": "Structure-Activity Relationship Analysis",
+      "description": "Analyzed privileged scaffolds and SAR patterns",
+      "total_molecules_analyzed": 99,
+      "unique_scaffolds": 41,
+      "total_compounds_in_scaffold_table": 99,
+      "scaffolds_above_min_count": 5,
+      "min_scaffold_count": 5,
+      "top_scaffold": {
+        "smiles": "c1cc(-c2cc3c4c(nc(OCC56CCCN5CCC6)nc4c2)N2CCCOC[C@H]2CO3)c2ccsc2c1",
+        "count": 1,
+        "mean_pic50": 9.097,
+        "std_pic50": null,
+        "note": "mean of a single measurement; standard deviation undefined"
+      },
+      "top_recurring_scaffold": {
+        "smiles": "c1ccc2c(-c3cc4nc(OCC56CCCN5CCC6)nc(N5CCCC6(CCO6)C5)c4cn3)cccc2c1",
+        "count": 5,
+        "mean_pic50": 8.58
+      },
+      "output_files": [
+        "results/kras_sar_analysis.csv",
+        "results/kras_scaffold_analysis.csv",
+        "figures/kras_chemical_space_pca.png",
+        "figures/kras_physicochemical_properties.png",
+        "figures/kras_top_scaffolds_potency.png"
+      ]
+    },
+    "step_3_structural_analysis": {
+      "step_name": "Target Analysis",
+      "description": "Analyzed KRAS protein structure and binding site",
+      "pdb_id": "7RT1",
+      "resolution": 1.27,
+      "ligand_info": {},
+      "binding_site_residues": [],
+      "output_files": [
+        "results/kras_structural_analysis.json",
+        "results/literature_findings.txt"
+      ]
+    },
+    "step_4_analogs_generation": {
+      "step_name": "Analogs Generation",
+      "description": "Generated novel KRAS inhibitor candidates using scaffold decoration",
+      "total_candidates_generated": 70,
+      "valid_molecules": 70,
+      "generation_method": "Scaffold-based decoration with functional group enumeration",
+      "source_scaffold": "c1cc(-c2cc3c4c(nc(OCC56CCCN5CCC6)nc4c2)N2CCCOC[C@H]2CO3)c2ccsc2c1",
+      "output_files": [
+        "results/kras_generated_candidates.csv",
+        "results/kras_top20_generated_candidates.csvfigures/kras_generation_pca.png",
+        "figures/kras_generation_tsne.png"
+      ]
+    },
+    "step_5_virtual_screening": {
+      "step_name": "Virtual Screening (Molecular Docking)",
+      "description": "Evaluated binding affinity of generated candidates using AutoDock Vina",
+      "molecules_docked": 20,
+      "best_docking_score": -9.062,
+      "mean_docking_score": -8.24795,
+      "docking_score_range": {
+        "min": -9.062,
+        "max": -7.816
+      },
+      "docking_method": "AutoDock Vina",
+      "target_pdb": "7RT1",
+      "output_files": [
+        "results/kras_docking_results.csv",
+        "figures/kras_docking_scores.png"
+      ]
+    },
+    "step_6_ml_modeling": {
+      "step_name": "Machine Learning Modeling",
+      "description": "Built predictive model for pIC50 using molecular descriptors",
+      "model_type": "Random Forest Regressor",
+      "features_used": "Morgan Fingerprints (2048-bit)",
+      "molecules_predicted": 20,
+      "model_performance": {
+        "r2_score": 0.6139585353049537,
+        "rmse": 0.7482827137664912,
+        "scaffold_split_r2": 0.6132260690060718,
+        "scaffold_split_rmse": 0.6185372080466924,
+        "scaffold_split_r2_sd": 0.09986695587169422,
+        "scaffold_split_repeats": 10,
+        "scaffold_split_stable": false,
+        "cross_validation": "0.6220539132799345 +/- 0.16137391449673918",
+        "mean_only_baseline_rmse": 1.2143281551735363,
+        "candidate_prediction_span": 0.457622350991306,
+        "n_candidates_out_of_domain": 0,
+        "potency_rankable": false,
+        "training_pic50_range": [
+          4.481486060122113,
+          9.69897000433602
+        ]
+      },
+      "prediction_range": {
+        "min_predicted_pic50": 5.643877507049728,
+        "max_predicted_pic50": 6.101499858041034
+      },
+      "output_files": [
+        "results/kras_candidate_predictions.csv",
+        "results/kras_pIC50_model.pkl",
+        "results/kras_model_metrics.json",
+        "figures/kras_model_performance.png",
+        "figures/kras_ml_docking_comparison.png"
+      ]
+    },
+    "step_7_admet_selection": {
+      "step_name": "ADME/Tox Prediction & Final Selection",
+      "description": "In silico ADME/Tox profiling and multi-parameter optimization",
+      "total_candidates_evaluated": 20,
+      "final_candidates_selected": 5,
+      "selection_criteria": [
+        "Predicted pIC50 (30% weight)",
+        "Docking Affinity (30% weight)",
+        "Drug-likeness QED (20% weight)",
+        "PAINS screening (10% weight)",
+        "Lipinski/Veber rules (10% weight)"
+      ],
+      "top_5_candidates": [
+        {
+          "candidate_id": "candidate_08",
+          "smiles": "c1ccc(-c2cc3nc(OCC45CCCN4CCC5)nc(N4CC5CCN(C4)N5)c3cn2)cc1",
+          "consensus_score": 0.8135408581697643,
+          "predicted_ic50_nm": 1729.3508629033636,
+          "docking_score_kcal_mol": -8.341,
+          "drug_likeness_qed": 0.6270817163395287,
+          "lipinski_pass": true,
+          "pains_clean": true
+        },
+        {
+          "candidate_id": "candidate_04",
+          "smiles": "c1cc(-c2cc3nc(OCC45CCCN4CCC5)nc(N4CC5CCC(C4)N5)c3cn2)ccn1",
+          "consensus_score": 0.8132180588534288,
+          "predicted_ic50_nm": 1864.7146227257604,
+          "docking_score_kcal_mol": -8.114,
+          "drug_likeness_qed": 0.6264361177068575,
+          "lipinski_pass": true,
+          "pains_clean": true
+        },
+        {
+          "candidate_id": "candidate_03",
+          "smiles": "c1ccc(-c2cc3nc(OCC45CCCN4CCC5)nc(N4CC5CCC(C4)N5)c3cn2)nc1",
+          "consensus_score": 0.8132180588534288,
+          "predicted_ic50_nm": 2270.5051585621163,
+          "docking_score_kcal_mol": -8.189,
+          "drug_likeness_qed": 0.6264361177068575,
+          "lipinski_pass": true,
+          "pains_clean": true
+        },
+        {
+          "candidate_id": "candidate_01",
+          "smiles": "c1ccc(-c2cc3nc(CCC45CCCN4CCC5)nc(N4CC5CCC(C4)N5)c3cn2)cc1",
+          "consensus_score": 0.811916432517434,
+          "predicted_ic50_nm": 1769.4039476248968,
+          "docking_score_kcal_mol": -8.397,
+          "drug_likeness_qed": 0.6238328650348678,
+          "lipinski_pass": true,
+          "pains_clean": true
+        },
+        {
+          "candidate_id": "candidate_11",
+          "smiles": "c1ccc(-c2cc3nc(OCC45CCCN4CCC5)nc(N4CC5CCC(N5)O4)c3cn2)cc1",
+          "consensus_score": 0.811242292342286,
+          "predicted_ic50_nm": 1750.1503514805074,
+          "docking_score_kcal_mol": -9.062,
+          "drug_likeness_qed": 0.622484584684572,
+          "lipinski_pass": true,
+          "pains_clean": true
+        }
+      ],
+      "output_files": [
+        "results/kras_admet_analysis.csv",
+        "results/kras_final_candidates.csv",
+        "figures/kras_candidate_radar_plot.png"
+      ]
+    }
+  },
+  "summary": {
+    "pipeline_completeness": "100%",
+    "total_inhibitors_screened": 99,
+    "novel_candidates_generated": 70,
+    "final_leads_identified": 5,
+    "best_predicted_ic50_nm": 1729.3508629033636,
+    "best_docking_score": -9.062,
+    "ml_model_r2": 0.6139585353049537,
+    "all_artifacts_verified": true,
+    "missing_artifacts": []
+  }
+}

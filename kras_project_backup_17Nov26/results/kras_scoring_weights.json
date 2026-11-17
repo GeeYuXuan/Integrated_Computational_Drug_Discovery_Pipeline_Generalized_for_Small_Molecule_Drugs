@@ -1,0 +1,21 @@
+{
+  "configured_weights": {
+    "Potency": 0.3,
+    "Docking": 0.3,
+    "QED": 0.2,
+    "PAINS": 0.1,
+    "DrugLike": 0.1
+  },
+  "dropped_as_noise": [
+    "Potency",
+    "Docking"
+  ],
+  "effective_weights": {
+    "Potency": 0.0,
+    "Docking": 0.0,
+    "QED": 0.5,
+    "PAINS": 0.25,
+    "DrugLike": 0.25
+  },
+  "note": "Terms whose spread across the candidate set fell below their own error estimate were set to zero and the remaining weights renormalised to sum to 1."
+}
