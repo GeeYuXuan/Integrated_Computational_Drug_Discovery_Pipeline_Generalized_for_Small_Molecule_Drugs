@@ -1,0 +1,47 @@
+{
+  "target": "brd4",
+  "model": "RandomForestRegressor",
+  "n_estimators": 500,
+  "features": "Morgan r=2 2048 bits",
+  "n_train_compounds": 7896,
+  "training_pic50_range": [
+    3.18575240426808,
+    9.522878745280336
+  ],
+  "random_split": {
+    "r2": 0.7928926264068276,
+    "rmse": 0.5533491163071723,
+    "mae": 0.377738631566357,
+    "n_test": 1580
+  },
+  "scaffold_split": {
+    "r2": 0.7320337163574899,
+    "rmse": 0.6168178381015745,
+    "r2_sd": 0.03809099046796411,
+    "rmse_sd": 0.040096501556465936,
+    "r2_min": 0.644022344101683,
+    "r2_max": 0.7913066217306486,
+    "r2_per_split": [
+      0.7499,
+      0.7239,
+      0.7503,
+      0.7571,
+      0.7195,
+      0.644,
+      0.741,
+      0.7913,
+      0.7219,
+      0.7214
+    ],
+    "n_repeats": 10,
+    "n_test": 1603,
+    "stable": true
+  },
+  "cv_r2_mean": 0.7728341699200639,
+  "cv_r2_std": 0.006555303114242051,
+  "mean_only_baseline_rmse": 1.2163783834268427,
+  "candidate_prediction_sd": 0.49686872055972287,
+  "candidate_prediction_span": 1.838908688186927,
+  "n_candidates_out_of_domain": 13,
+  "potency_rankable": true
+}

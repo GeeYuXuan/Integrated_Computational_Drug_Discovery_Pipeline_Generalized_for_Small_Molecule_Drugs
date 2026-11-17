@@ -1,0 +1,29 @@
+================================================================================
+BRD4 WT Analysis Findings
+================================================================================
+
+[1] PMID: 37495688
+Title: Rewiring cancer drivers to activate apoptosis.
+Query: BRD4 resistance mechanisms
+Abstract: Genes that drive the proliferation, survival, invasion and metastasis of malignant cells have been identified for many human cancers<sup>1-4</sup>. Independent studies have identified cell death pathways that eliminate cells for the good of the organism<sup>5,6</sup>. The coexistence of cell death p...
+
+[2] PMID: 41187371
+Title: Targeting BRD4 in cancer therapy: From inhibitors and degraders to novel combination strategies and resistance mechanisms.
+Query: BRD4 resistance mechanisms
+Abstract: Bromodomain-containing protein 4 (BRD4), a key member of the BET family, is integral to epigenetic regulation through its recognition of acetylated histones and its modulation of transcriptional programs associated with cell cycle progression, DNA damage repair, and inflammatory responses. The overe...
+
+[3] PMID: 41131284
+Title: BRD4 and MYB inhibition overcomes venetoclax resistance in EVI1-rearranged acute myeloid leukemia.
+Query: BRD4 resistance mechanisms
+Abstract: EVI1-rearranged acute myeloid leukemia (AML) with inv(3)(q21q26) or t(3;3)(q21q26) represents a distinct and aggressive subtype characterized by poor prognosis and limited treatment options. However, the optimal strategy to overcome resistance to conventional therapy remains elusive. Building upon o...
+
+[4] PMID: 38822666
+Title: BRD4 degraders may effectively counteract therapeutic resistance of leukemic stem cells in AML and ALL.
+Query: BRD4 resistance mechanisms
+Abstract: Acute myeloid leukemia (AML) and acute lymphoblastic leukemia (ALL) are life-threatening hematopoietic malignancies characterized by clonal expansion of leukemic blasts in the bone marrow and peripheral blood. The epigenetic reader BRD4 and its downstream effector MYC have recently been identified a...
+
+[5] PMID: 36711980
+Title: Regulated Induced Proximity Targeting Chimeras (RIPTACs): a Novel Heterobifunctional Small Molecule Therapeutic Strategy for Killing Cancer Cells Selectively.
+Query: BRD4 resistance mechanisms
+Abstract: While specific cell signaling pathway inhibitors have yielded great success in oncology, directly triggering cancer cell death is one of the great drug discovery challenges facing biomedical research in the era of precision oncology. Attempts to eradicate cancer cells expressing unique target protei...
+

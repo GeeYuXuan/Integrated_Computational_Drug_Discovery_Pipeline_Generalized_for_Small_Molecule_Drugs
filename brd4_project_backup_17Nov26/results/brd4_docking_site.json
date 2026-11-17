@@ -1,0 +1,17 @@
+{
+  "pdb": "/content/workflow/data/3MXF.pdb",
+  "source": "config:ligand_resname",
+  "reference": "JQ1/A/1",
+  "n_atoms": 31,
+  "extent": 9.403354838709678,
+  "n_copies": 1,
+  "box_center": [
+    28.751032258064516,
+    15.82567741935484,
+    -2.335483870967742
+  ],
+  "box_size": 22.0,
+  "pdb_id": "3MXF",
+  "exhaustiveness": 8,
+  "num_modes": 9
+}

@@ -1,0 +1,14 @@
+brd4_pIC50_model.pkl is NOT in this deposit.
+
+The trained Random Forest is 234.2 MB -- a 500-tree forest over 7,896
+compounds. GitHub rejects any single file above 100 MB, so committing it
+would make the push fail outright. Every other artifact of the run is here.
+
+To regenerate it, re-run Step 6 of the notebook against the deposited
+brd4_bioactivity_full.csv. The model is fully determined by that file plus
+the configuration (500 trees, Morgan r=2 2048 bits, random_state fixed), so
+nothing about the run is lost -- only the convenience of the pickle.
+
+The metrics it produced are recorded in brd4_model_metrics.json:
+  random-split   R2 +0.793  RMSE 0.553  MAE 0.378
+  scaffold-split R2 +0.732 +/- 0.038 over 10 repeats
