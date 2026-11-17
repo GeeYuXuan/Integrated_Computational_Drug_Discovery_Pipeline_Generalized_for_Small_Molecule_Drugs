@@ -14,6 +14,7 @@ into one point. That is correct only when a structure contains exactly one heter
 group. Measured here:
 
     EGFR 5Y9T   1 hetero group                 0.0 A off   (accidentally correct)
+    BRD4 3MXF   JQ1 + ethylene glycol x3 ...   3.7 A off   (pocket edge clipped)
     KRAS 7RT1   2 ligand copies + GDP + Mg     7.3 A off   (pocket clipped)
     mTOR 4JSV   ADP x2 + ions, in a dimer     37.7 A off   (box held no pocket)
 """
@@ -34,6 +35,7 @@ STRUCTURES = Path(__file__).resolve().parent / "data"
 # (target, structure, true pocket centre = centroid of ONE reference ligand copy)
 CASES = [
     ("kras", "7RT1.pdb", (1.58, 4.75, -23.51)),
+    ("brd4", "3MXF.pdb", (28.75, 15.83, -2.34)),
     ("egfr", "5Y9T.pdb", (-0.46, 49.56, -17.66)),
     ("mtor", "4JSV.pdb", (50.12, -1.80, -45.90)),
 ]

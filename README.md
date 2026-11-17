@@ -27,7 +27,7 @@ optimisation.
 2. Run **Step 0** (installs dependencies, once per session).
 3. Run **Step 0b** and set one line:
    ```python
-   TARGET = "kras"      # "kras" | "egfr" | "mtor"
+   TARGET = "kras"      # "kras" | "brd4" | "egfr" | "mtor"
    ```
 4. Run the remaining cells in order.
 
@@ -97,11 +97,13 @@ trusting the scores.
 ├── pipeline_common.py                          shared config + helpers  ← edit this
 ├── requirements.txt                             pinned dependency floors
 ├── tests/
-│   ├── data/                                    KRAS, EGFR and mTOR structures
+│   ├── data/                                    KRAS, BRD4, EGFR and mTOR structures
 │   ├── test_docking_box.py                      box-centring regression test
-│   └── test_pipeline_common.py                  config + scoring guard tests
+│   ├── test_pipeline_common.py                  config + scoring guard tests
+│   └── test_review_fixes.py                     peer-review regression tests
 ├── Computational Discovery of Novel KRAS Inhibitors.pdf   write-up of the KRAS run
-└── kras_project_backup_17Nov26/                 example outputs — KRAS G12D
+├── kras_project_backup_17Nov26/                 example outputs — KRAS G12D
+└── brd4_project_backup_17Nov26/                 example outputs — BRD4
 ```
 
 The backup folder holds one complete run:
@@ -121,11 +123,43 @@ spread can be recomputed from the deposit alone, and
 `results/kras_scoring_weights.json`, which records the weights the ranking
 actually used after the noise-gated terms were dropped.
 
+`brd4_project_backup_17Nov26/` is a second complete run, on the same code and the
+same day, and it exists to answer an obvious objection to the KRAS result. There,
+both quantitative terms fell below their own error and the consensus score
+collapsed to `0.5 × QED + 0.5`. Is the noise gate simply always saying no?
+
+It is not. On BRD4 the potency term **survives** and carries the largest weight:
+
+| | KRAS | BRD4 |
+|---|---|---|
+| Potent compounds (< 50 nM) | 99 | 1,679 |
+| Distinct scaffolds | 41 | 3,309 |
+| Scaffold-split R² | 0.613 ± 0.100 | 0.732 ± 0.038 |
+| Candidates in applicability domain | 20/20 | 7/20 |
+| Terms dropped as noise | Potency **and** Docking | Docking only |
+| Effective weights | QED 0.50, PAINS/DrugLike 0.25 | **Potency 0.43**, QED 0.29, … |
+| Consensus score range | 0.811 – 0.814 | 0.566 – 0.623 |
+
+So the gate refused to rank KRAS and agreed to rank BRD4, and the one-scaffold
+collapse was a property of KRAS's thin potent set rather than of the pipeline.
+Two caveats are recorded in that deposit rather than smoothed over: docking was
+still dropped (2.32 kcal/mol span against Vina's ~2.85 error), and 13 of the 20
+candidates fall outside the applicability domain, so those predictions are
+extrapolation. `results/brd4_pIC50_model.pkl` is **not** included — the trained
+forest is 234 MB, above GitHub's 100 MB per-file limit; see the `.NOTE.txt`
+beside it.
+
+BRD4 was chosen as a tractable stand-in for MYC. MYC itself cannot be run here:
+no drug-like ligand has ever been co-crystallised with the MYC protein, so
+`ligand_resname` has nothing to point at and `resolve_box_center` refuses rather
+than centring a box on empty space. BET inhibition is the best-established route
+to suppressing MYC, and 3MXF is the canonical BRD4 bromodomain with JQ1 bound.
+
 The earlier EGFR and mTOR example outputs have been **removed**: they predated the
 box, potency-cutoff and training-range fixes, so every number in them was
 superseded — the mTOR search box alone sat 37.7 Å from the binding site. Their
 crystal structures are kept in `tests/data/`, because those are RCSB inputs rather
-than pipeline results and the box regression still checks all three. To regenerate
+than pipeline results and the box regression still checks all four. To regenerate
 either target, set `ACTIVE_TARGET` in `pipeline_common.py` and run the notebook.
 
 ### Running the tests

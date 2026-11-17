@@ -61,6 +61,25 @@ TARGETS = {
         "box_center":     None,            # explicit [x, y, z] overrides everything
     },
     # -------------------------------------------------------------------------
+    # BRD4 stands in for MYC, which cannot be docked: no drug-like ligand has
+    # ever been co-crystallised with the MYC protein, so there is nothing to
+    # centre a box on and resolve_box_center refuses rather than guess. BET
+    # inhibition is the best-established route to suppressing MYC -- JQ1's
+    # original result was MYC suppression -- and 3MXF is the canonical BRD4
+    # bromodomain with JQ1 bound. Deposited run: brd4_project_backup_17Nov26/.
+    "brd4": {
+        "target_name":    "brd4",
+        "search_term":    "BRD4",
+        "chembl_id":      "CHEMBL1163125",  # Bromodomain-containing protein 4
+        "mutant_filter":  None,            # wild type
+        # --- structure ---
+        "manual_pdb_id":  "3MXF",          # BRD4 bromodomain 1, 1.6 A
+        "ligand_resname": "JQ1",           # the co-crystal BET inhibitor
+        "ligand_chain":   "A",             # one protein chain, one JQ1 copy
+        "active_site_residue": 140,        # Asn140, the acetyl-lysine anchor
+        "box_center":     None,
+    },
+    # -------------------------------------------------------------------------
     "egfr": {
         "target_name":    "egfr",
         "search_term":    "EGFR",
