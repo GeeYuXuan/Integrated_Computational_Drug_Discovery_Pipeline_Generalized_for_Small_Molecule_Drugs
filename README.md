@@ -307,7 +307,7 @@ were reported, and the report has been corrected to match.
 | **Only the first assay id survived aggregation** | Every "unique assays" figure was an undercount — 16 reported against 25 real for the curated set, 11 against 17 for the potent subset — and the dominant-assay share was computed over compounds rather than measurements | Carry `n_assays` per compound and take any dataset-level count from `{target}_measurements.csv` ([`test_review_fixes.py`](tests/test_review_fixes.py)) |
 | **Pocket residues counted waters, around the wrong ligand** | Biopython marks waters `W`, not `H_`, so they passed the protein filter; and `ligands[0]` is GDP in 7RT1, not the inhibitor. "37 pocket residues" was 24 protein residues + 13 waters around a different site | Pin the reference to `ligand_resname`, exclude waters, report both counts |
 | **Resolution parser returned the remark number** | `REMARK   2 RESOLUTION.    1.27 ANGSTROMS.` was read as 2.0 Å, for every structure | Take the token after `RESOLUTION`, never the first float on the line |
-| **Receptor converted with no hydrogens and no charges** | The deposited `7RT1_receptor.pdbqt` has 1,367 atoms, 0 hydrogens and every partial charge 0.000, while the Methods claimed protonation at pH 7.4 with assigned charges | Pass `-p 7.4`, then verify the written file and say so loudly if it still has no hydrogens. Charges are a separate problem — see below |
+| **Receptor converted with no hydrogens** | The deposited `7RT1_receptor.pdbqt` had 1,367 atoms and 0 hydrogens, while the Methods claimed protonation at pH 7.4 with assigned charges. The missing hydrogens are the half that affects Vina's hydrogen-bond term | Pass `-p 7.4`, then verify the written file and say so loudly if it still has no hydrogens. The all-zero charge column is harmless for Vina — see below |
 | **Novelty measured against the potent subset only** | A generated molecule identical to one of the weaker curated compounds was reported as novel | Build the reference from `{target}_bioactivity_full.csv` |
 | **Applicability domain measured against all 552** | Includes the 20 % the model never saw, so the domain looks wider than it is | Compare against the training partition |
 | **Effective weights and dropped terms never exported** | `Scoring_Dropped_Terms` was computed and printed but written to no file, so the CSVs gave no sign that two of five terms had been withheld | Export the column with both tables and write `{target}_scoring_weights.json` |
@@ -333,9 +333,18 @@ Measured against Open Babel 3.1.0 on `7RT1_clean.pdb`:
 | `-xr --partialcharge gasteiger` | — | — | conversion fails |
 
 So `-p 7.4` does add the polar hydrogens, but **this Open Babel's PDBQT writer
-emits `+0.000` for every atom whatever it is asked**. Real partial charges need
-`prepare_receptor4.py` (ADFR), which this pipeline does not run. The report
-says so rather than implying otherwise.
+emits `+0.000` for every atom whatever it is asked**.
+
+That turns out not to matter here, and an earlier revision of this README and
+of the report got it wrong by saying it starved an electrostatic term. Per
+[Vina's FAQ](https://autodock-vina.readthedocs.io/en/latest/faq.html), "AutoDock
+Vina ignores the user-supplied partial charges" and "has its own way of dealing
+with the electrostatic interactions through the hydrophobic and the hydrogen
+bonding terms" — the default scoring function has no explicit electrostatic
+term for zero charges to starve. The **hydrogens** were the real correction,
+because the hydrogen-bond term is typed on polar hydrogens. Charges would
+matter only for a charge-based function such as AutoDock4 (`--scoring ad4`),
+which needs a receptor from `prepare_receptor4.py` (ADFR).
 
 **Docking reproducibility.** Re-docking the same 20 ligands against the *same*
 unprotonated receptor with a different Vina build (1.2.7 vs Colab's apt
